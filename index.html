@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ค้นหาสมุนไพร</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f0f4f0; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; }
+        .result-item { background: white; padding: 15px; margin-top: 5px; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h3>🔍 ค้นหาสมุนไพร</h3>
+    <input type="text" id="searchInput" placeholder="พิมพ์อย่างน้อย 2 ตัวอักษร..." oninput="searchData()">
+    <div id="results"></div>
+
+    <script>
+        // เริ่มต้น LIFF
+        liff.init({ liffId: "2008726880-JRgSRcyj" });
+
+        const dataFromSheet = [
+            "มะนาว", "มะพร้าว", "มะรุม", "มะระ", "ปาล์ม" 
+            // ในขั้นตอนถัดไป คุณสามารถเขียน API ให้ดึงข้อมูลจาก Google Sheet จริงๆ มาใส่ที่นี่
+        ];
+
+        function searchData() {
+            const query = document.getElementById('searchInput').value;
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            if (query.length < 1) return;
+
+            const filtered = dataFromSheet.filter(item => item.includes(query));
+
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                div.innerText = item;
+                div.onclick = () => sendToLine(item);
+                resultsDiv.appendChild(div);
+            });
+        }
+
+        function sendToLine(name) {
+            liff.sendMessages([{
+                type: 'text',
+                text: name // ส่งชื่อสมุนไพรกลับไปเป็น Keyword เพื่อให้ Bot ใน GAS ค้นต่อ
+            }]).then(() => {
+                liff.closeWindow(); // ปิดหน้าต่างค้นหา
+            });
+        }
+    </script>
+</body>
+</html>
