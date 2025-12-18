@@ -13,21 +13,20 @@
             font-family: 'Sarabun', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #e6efe6; /* สีพื้นหลังเขียวอ่อนตุ่นๆ ตามภาพ */
+            background-color: #e6efe6; /* เขียวพาสเทล */
             color: #333;
             min-height: 100vh;
         }
 
-        /* Container หลัก */
         .container {
             padding: 20px;
             max-width: 480px;
             margin: 0 auto;
         }
 
-        /* ส่วนหัวและกล่องค้นหา (สีขาวโค้งๆ ด้านบน) */
+        /* Search Card */
         .search-card {
-            background: rgba(255, 255, 255, 0.6); /* โปร่งแสงนิดๆ */
+            background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 20px;
@@ -59,7 +58,7 @@
             padding: 14px 16px;
             border-radius: 12px;
             border: none;
-            background-color: #f0f2f0; /* สีเทาอ่อน */
+            background-color: #f0f2f0;
             font-size: 16px;
             outline: none;
             color: #333;
@@ -72,8 +71,20 @@
             font-size: 13px;
             color: #888;
         }
+        
+        /* ข้อความแจ้งเตือนเมื่อพบข้อมูล */
+        .found-hint {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #2e7d32; /* สีเขียวเข้ม */
+            background-color: #e8f5e9;
+            padding: 10px;
+            border-radius: 8px;
+            line-height: 1.5;
+            border: 1px solid #c8e6c9;
+        }
 
-        /* Result Count */
+        /* Count */
         .count-text {
             font-size: 13px;
             color: #777;
@@ -84,7 +95,7 @@
         #loading { text-align: center; color: #888; margin-top: 20px; font-size: 14px; }
         .hidden { display: none; }
 
-        /* Result Items (Cards) */
+        /* Result Items */
         .result-item {
             background: white;
             border-radius: 16px;
@@ -127,7 +138,7 @@
             color: #666;
         }
 
-        /* Contact Box (Demo) */
+        /* Contact Box */
         .contact-box {
             background: rgba(255, 255, 255, 0.5);
             border-radius: 16px;
@@ -150,7 +161,7 @@
             padding: 10px;
             border-radius: 12px;
             border: none;
-            background-color: #e0e0e0; /* สีปุ่มเทาตามภาพ */
+            background-color: #e0e0e0;
             color: #555;
             font-family: 'Sarabun', sans-serif;
             font-size: 14px;
@@ -159,7 +170,7 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
-            cursor: default; /* Demo click ไม่ได้ */
+            cursor: default;
         }
         .demo-btn.active {
              background-color: #fff;
@@ -176,10 +187,15 @@
             <div class="subtitle">พิมพ์อย่างน้อย 2 ตัวอักษร เพื่อค้นหา แล้วแตะรายการที่ต้องการ ระบบจะส่งชื่อสมุนไพรกลับไปในแชทอัตโนมัติ</div>
             
             <input type="text" id="searchInput" placeholder="เช่น มะ / กระ / ชา" oninput="searchData()" disabled>
-            <div class="helper-text">เริ่มพิมพ์เพื่อค้นหา (อย่างน้อย 2 ตัวอักษร)</div>
             
-            <div id="notFoundBox" class="contact-box hidden">
-                <div class="contact-title">หากไม่พบสมุนไพรที่ต้องการ กรุณาติดต่อได้ที่</div>
+            <div id="defaultHelper" class="helper-text">เริ่มพิมพ์เพื่อค้นหา (อย่างน้อย 2 ตัวอักษร)</div>
+
+            <div id="foundMessage" class="found-hint hidden">
+                ✅ นี่คือคำตอบ แต่ถ้าท่านอยากเห็นคำตอบอีกครั้งในแชท ก็ลองคลิกที่ชื่อสมุนไพรได้เลย
+            </div>
+            
+            <div id="contactArea" class="contact-box">
+                <div class="contact-title" id="contactTitle">หากไม่พบสมุนไพรที่ต้องการ กรุณาติดต่อได้ที่</div>
                 <div class="btn-group">
                     <div class="demo-btn active">📞 โทร</div>
                     <div class="demo-btn active">💬 แอดไลน์</div>
@@ -195,7 +211,7 @@
 
     <script>
         // ----------------------------------------------------
-        // ใส่ URL Web App ใหม่ตรงนี้
+        // อย่าลืมใส่ Web App URL เดิมของคุณตรงนี้
         // ----------------------------------------------------
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwS1fCVXO2I9zmH-tAnqPdhxSYGmPGIIQ0FMfNjR6kb6Ft2hdHL7msTVBK_dkl52OGK/exec"; 
 
@@ -224,34 +240,50 @@
             const query = document.getElementById('searchInput').value.trim();
             const resultsDiv = document.getElementById('results');
             const countDiv = document.getElementById('resultCount');
-            const notFoundBox = document.getElementById('notFoundBox');
+            
+            const contactArea = document.getElementById('contactArea');
+            const foundMessage = document.getElementById('foundMessage');
+            const defaultHelper = document.getElementById('defaultHelper');
             
             resultsDiv.innerHTML = '';
             countDiv.classList.add('hidden');
-            notFoundBox.classList.add('hidden');
 
-            // เงื่อนไข: ต้องพิมพ์อย่างน้อย 2 ตัวอักษร
-            if (query.length < 2) return;
+            // กรณี 1: ยังพิมพ์ไม่ครบ 2 ตัวอักษร (ว่างเปล่า หรือพิมพ์สั้นไป)
+            if (query.length < 2) {
+                // แสดงปุ่มติดต่อ, ซ่อนข้อความเจอ, แสดง Helper ปกติ
+                contactArea.classList.remove('hidden'); 
+                foundMessage.classList.add('hidden');
+                defaultHelper.classList.remove('hidden');
+                return;
+            }
 
             const filtered = allHerbs.filter(item => item.name.includes(query));
 
-            // แสดงจำนวนรายการ
+            // กรณี 2: ค้นหาแล้ว "พบข้อมูล"
             if (filtered.length > 0) {
                 countDiv.innerText = `พบ ${filtered.length} รายการ`;
                 countDiv.classList.remove('hidden');
-            } else {
-                notFoundBox.classList.remove('hidden'); // แสดงกล่องติดต่อเมื่อไม่เจอ
+                
+                // แสดงข้อความแนะนำพิเศษ, ซ่อน Helper ปกติ, ซ่อนปุ่มติดต่อ(เพื่อไม่ให้รก)
+                foundMessage.classList.remove('hidden');
+                defaultHelper.classList.add('hidden');
+                contactArea.classList.add('hidden'); 
+            } 
+            // กรณี 3: ค้นหาแล้ว "ไม่พบข้อมูล"
+            else {
+                // แสดงปุ่มติดต่อกลับมา, ซ่อนข้อความแนะนำ, แสดง Helper ปกติ
+                contactArea.classList.remove('hidden');
+                foundMessage.classList.add('hidden');
+                defaultHelper.classList.remove('hidden');
+                
                 resultsDiv.innerHTML = '<div style="text-align:center; color:#999; margin-top:20px;">ไม่พบผลลัพธ์</div>';
                 return;
             }
 
+            // Loop สร้างการ์ดผลลัพธ์
             filtered.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'result-item';
-                
-                // สร้างการ์ดตามดีไซน์
-                // ชื่อ + Badge ID
-                // รายละเอียด (INR + LOE)
                 div.innerHTML = `
                     <div class="card-top">
                         <div class="herb-name">${item.name}</div>
@@ -261,7 +293,6 @@
                         ${item.inr || '-'} • LOE: ${item.loe || '-'}
                     </div>
                 `;
-                
                 div.onclick = () => sendToLine(item.name);
                 resultsDiv.appendChild(div);
             });
@@ -269,10 +300,9 @@
 
         function sendToLine(name) {
             if (!liff.isInClient()) {
-                alert("ส่งค่า: " + name); // สำหรับ Test ใน Browser
+                alert("ส่งค่า: " + name);
                 return;
             }
-            
             liff.sendMessages([{
                 type: 'text',
                 text: name 
