@@ -8,12 +8,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* Setup & Reset */
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'Sarabun', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #e6efe6; /* เขียวพาสเทล */
+            background-color: #eff5ef;
             color: #333;
             min-height: 100vh;
         }
@@ -26,96 +26,111 @@
 
         /* Search Card */
         .search-card {
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-radius: 24px;
+            padding: 24px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             margin-bottom: 20px;
+            text-align: left;
         }
 
         h3 {
-            margin: 0 0 10px 0;
-            color: #444;
+            margin: 0 0 8px 0;
+            color: #2e4a33;
             font-size: 18px;
             font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+        
+        h3::before {
+            content: '';
+            display: block;
+            width: 10px;
+            height: 10px;
+            background-color: #66bb6a;
+            border-radius: 50%;
+        }
+
         h3 span {
             font-weight: 400;
             font-size: 16px;
+            color: #555;
         }
 
         .subtitle {
-            font-size: 14px;
+            font-size: 13px;
             color: #666;
-            margin-bottom: 15px;
-            line-height: 1.4;
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
 
-        /* Input Field */
+        /* Input Field - ปรับให้ดู Friendly ขึ้น */
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 10px;
+        }
         input {
             width: 100%;
-            padding: 14px 16px;
-            border-radius: 12px;
+            padding: 16px 20px;
+            border-radius: 16px;
             border: none;
             background-color: #f0f2f0;
             font-size: 16px;
+            font-family: 'Sarabun', sans-serif;
             outline: none;
             color: #333;
+            transition: all 0.3s;
         }
         input::placeholder { color: #aaa; }
-        input:focus { background-color: #fff; box-shadow: 0 0 0 2px #a5d6a7; }
+        /* ลบสไตล์ Disabled ออก เพราะเราจะให้พิมพ์ได้ตลอด */
+        input:focus { 
+            background-color: #fff; 
+            box-shadow: 0 0 0 2px #a5d6a7; 
+        }
 
         .helper-text {
-            margin-top: 8px;
-            font-size: 13px;
+            font-size: 12px;
             color: #888;
-        }
-        
-        /* ข้อความแจ้งเตือนเมื่อพบข้อมูล */
-        .found-hint {
-            margin-top: 10px;
-            font-size: 13px;
-            color: #2e7d32; /* สีเขียวเข้ม */
-            background-color: #e8f5e9;
-            padding: 10px;
-            border-radius: 8px;
-            line-height: 1.5;
-            border: 1px solid #c8e6c9;
+            margin-left: 5px;
         }
 
-        /* Count */
+        /* Result Count */
         .count-text {
             font-size: 13px;
             color: #777;
-            margin: 15px 0 10px 5px;
+            margin: 10px 0 10px 5px;
         }
 
-        /* Loading */
-        #loading { text-align: center; color: #888; margin-top: 20px; font-size: 14px; }
-        .hidden { display: none; }
+        /* Loading Indicator */
+        #loading { 
+            text-align: center; color: #888; margin-top: 20px; font-size: 13px; 
+            display: flex; justify-content: center; gap: 5px;
+        }
+        .hidden { display: none !important; }
 
         /* Result Items */
         .result-item {
             background: white;
-            border-radius: 16px;
-            padding: 16px;
+            border-radius: 18px;
+            padding: 16px 20px;
             margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             cursor: pointer;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.1s;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
-        .result-item:active { transform: scale(0.98); }
+        .result-item:active { 
+            transform: scale(0.98); 
+            background-color: #f9f9f9;
+        }
 
         .card-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
+            align-items: center;
+            margin-bottom: 6px;
         }
 
         .herb-name {
@@ -125,12 +140,12 @@
         }
 
         .id-badge {
-            background-color: #eee;
-            color: #777;
-            font-size: 12px;
+            background-color: #f0f0f0;
+            color: #888;
+            font-size: 11px;
             padding: 4px 10px;
             border-radius: 20px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .card-detail {
@@ -140,42 +155,48 @@
 
         /* Contact Box */
         .contact-box {
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
             padding: 15px;
-            margin-top: 20px;
-            text-align: center;
+            margin-top: 25px;
+            border: 1px solid rgba(255,255,255,0.5);
         }
         .contact-title {
-            font-size: 14px;
+            font-size: 13px;
             color: #666;
             margin-bottom: 12px;
             text-align: left;
+            margin-left: 5px;
         }
         .btn-group {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
+        
         .demo-btn {
             flex: 1;
-            padding: 10px;
-            border-radius: 12px;
-            border: none;
-            background-color: #e0e0e0;
-            color: #555;
+            padding: 10px 15px;
+            border-radius: 50px;
+            border: 1px solid #e0e0e0;
+            background-color: #f7f7f7;
+            color: #444;
             font-family: 'Sarabun', sans-serif;
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 15px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
-            cursor: default;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s;
         }
-        .demo-btn.active {
-             background-color: #fff;
-             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .demo-btn:active {
+             background-color: #e8e8e8;
+             transform: translateY(1px);
+             box-shadow: none;
         }
+        .icon-svg { width: 18px; height: 18px; fill: currentColor; }
 
     </style>
 </head>
@@ -183,27 +204,30 @@
 
     <div class="container">
         <div class="search-card">
-            <h3>🟢 ค้นหาสมุนไพร <span>(ผลต่อ INR)</span></h3>
+            <h3>ค้นหาสมุนไพร <span>(ผลต่อ INR)</span></h3>
             <div class="subtitle">พิมพ์อย่างน้อย 2 ตัวอักษร เพื่อค้นหา แล้วแตะรายการที่ต้องการ ระบบจะส่งชื่อสมุนไพรกลับไปในแชทอัตโนมัติ</div>
             
-            <input type="text" id="searchInput" placeholder="เช่น มะ / กระ / ชา" oninput="searchData()" disabled>
-            
-            <div id="defaultHelper" class="helper-text">เริ่มพิมพ์เพื่อค้นหา (อย่างน้อย 2 ตัวอักษร)</div>
-
-            <div id="foundMessage" class="found-hint hidden">
-                ✅ นี่คือคำตอบ แต่ถ้าท่านอยากเห็นคำตอบอีกครั้งในแชท ก็ลองคลิกที่ชื่อสมุนไพรได้เลย
+            <div class="input-wrapper">
+                <input type="text" id="searchInput" placeholder="เช่น มะ / กระ / ชา" oninput="searchData()">
             </div>
+            <div class="helper-text">เริ่มพิมพ์เพื่อค้นหา (อย่างน้อย 2 ตัวอักษร)</div>
             
-            <div id="contactArea" class="contact-box">
-                <div class="contact-title" id="contactTitle">หากไม่พบสมุนไพรที่ต้องการ กรุณาติดต่อได้ที่</div>
+            <div id="notFoundBox" class="contact-box hidden">
+                <div class="contact-title">หากไม่พบสมุนไพรที่ต้องการ กรุณาติดต่อได้ที่</div>
                 <div class="btn-group">
-                    <div class="demo-btn active">📞 โทร</div>
-                    <div class="demo-btn active">💬 แอดไลน์</div>
+                    <div class="demo-btn">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.49-5.15-3.8-6.62-6.63l1.97-1.57c.26-.29.35-.69.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3.28 3 3.92 3 4.78c0 9.77 8.23 18 18 18 .88 0 1.54-.67 1.54-1.21v-3.72c0-.54-.45-.99-.99-.99z"/></svg>
+                        โทร
+                    </div>
+                    <div class="demo-btn">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 5.57 2 10c0 2.45 1.38 4.62 3.59 6.08-.2.72-.73 2.58-.84 3.03-.09.4.17.61.42.44 2.22-1.47 3.86-2.52 4.18-2.73.53.08 1.08.13 1.65.13 5.52 0 10-3.57 10-8s-4.48-8-10-8z"/></svg>
+                        แอดไลน์
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div id="loading">กำลังโหลดข้อมูล...</div>
+        <div id="loading" class="hidden">🔄 กำลังโหลดข้อมูล...</div>
 
         <div id="resultCount" class="count-text hidden"></div>
         <div id="results"></div>
@@ -211,26 +235,55 @@
 
     <script>
         // ----------------------------------------------------
-        // อย่าลืมใส่ Web App URL เดิมของคุณตรงนี้
+        // ใส่ Web App URL เดิมของคุณ (ถ้ายังไม่ได้เปลี่ยน Key ก็ใช้อันเดิม)
         // ----------------------------------------------------
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwS1fCVXO2I9zmH-tAnqPdhxSYGmPGIIQ0FMfNjR6kb6Ft2hdHL7msTVBK_dkl52OGK/exec"; 
 
         let allHerbs = [];
+        let isDataLoaded = false;
 
         async function main() {
+            // 1. โหลด Cache (ถ้ามี)
+            const cachedData = localStorage.getItem('herbData_v1');
+            if (cachedData) {
+                try {
+                    allHerbs = JSON.parse(cachedData);
+                    isDataLoaded = true;
+                } catch (e) { console.error("Cache Error", e); }
+            }
+
+            // เริ่ม LIFF
             await liff.init({ liffId: "2008726880-JRgSRcyj" });
             
+            // 2. ดึงข้อมูลจริง (เบื้องหลัง)
+            fetchData();
+        }
+
+        async function fetchData() {
+            const loading = document.getElementById('loading');
+            
+            // ถ้ายังไม่มีข้อมูลใน Cache ให้โชว์ Loading รอไว้ด้านล่าง
+            if (!isDataLoaded) loading.classList.remove('hidden');
+
             try {
                 const response = await fetch(GAS_API_URL);
-                allHerbs = await response.json();
+                const newData = await response.json();
                 
-                document.getElementById('loading').classList.add('hidden');
+                allHerbs = newData;
+                isDataLoaded = true;
+                localStorage.setItem('herbData_v1', JSON.stringify(newData));
+                
+                loading.classList.add('hidden');
+                
+                // ถ้าลูกค้าพิมพ์รอไว้แล้ว ให้สั่งค้นหาทันทีที่ข้อมูลมาถึง
                 const input = document.getElementById('searchInput');
-                input.disabled = false;
-                input.focus();
+                if(input.value.length >= 2) {
+                    searchData();
+                }
+
             } catch (error) {
-                document.getElementById('loading').innerText = "โหลดข้อมูลล้มเหลว";
-                console.error(error);
+                console.error("Fetch Error:", error);
+                loading.innerText = "เชื่อมต่อฐานข้อมูลไม่ได้";
             }
         }
 
@@ -240,47 +293,36 @@
             const query = document.getElementById('searchInput').value.trim();
             const resultsDiv = document.getElementById('results');
             const countDiv = document.getElementById('resultCount');
-            
-            const contactArea = document.getElementById('contactArea');
-            const foundMessage = document.getElementById('foundMessage');
-            const defaultHelper = document.getElementById('defaultHelper');
+            const notFoundBox = document.getElementById('notFoundBox');
+            const loading = document.getElementById('loading');
             
             resultsDiv.innerHTML = '';
             countDiv.classList.add('hidden');
+            notFoundBox.classList.add('hidden');
 
-            // กรณี 1: ยังพิมพ์ไม่ครบ 2 ตัวอักษร (ว่างเปล่า หรือพิมพ์สั้นไป)
-            if (query.length < 2) {
-                // แสดงปุ่มติดต่อ, ซ่อนข้อความเจอ, แสดง Helper ปกติ
-                contactArea.classList.remove('hidden'); 
-                foundMessage.classList.add('hidden');
-                defaultHelper.classList.remove('hidden');
-                return;
+            // ถ้าพิมพ์ไม่ถึง 2 ตัวอักษร ไม่ทำอะไร
+            if (query.length < 2) return;
+
+            // *** สำคัญ: ถ้าข้อมูลยังโหลดไม่เสร็จ ให้ขึ้น Loading แทน Not Found ***
+            if (!isDataLoaded || allHerbs.length === 0) {
+                loading.classList.remove('hidden');
+                loading.innerText = "กำลังค้นหาข้อมูล...";
+                return; 
+            } else {
+                loading.classList.add('hidden');
             }
 
             const filtered = allHerbs.filter(item => item.name.includes(query));
 
-            // กรณี 2: ค้นหาแล้ว "พบข้อมูล"
             if (filtered.length > 0) {
                 countDiv.innerText = `พบ ${filtered.length} รายการ`;
                 countDiv.classList.remove('hidden');
-                
-                // แสดงข้อความแนะนำพิเศษ, ซ่อน Helper ปกติ, ซ่อนปุ่มติดต่อ(เพื่อไม่ให้รก)
-                foundMessage.classList.remove('hidden');
-                defaultHelper.classList.add('hidden');
-                contactArea.classList.add('hidden'); 
-            } 
-            // กรณี 3: ค้นหาแล้ว "ไม่พบข้อมูล"
-            else {
-                // แสดงปุ่มติดต่อกลับมา, ซ่อนข้อความแนะนำ, แสดง Helper ปกติ
-                contactArea.classList.remove('hidden');
-                foundMessage.classList.add('hidden');
-                defaultHelper.classList.remove('hidden');
-                
-                resultsDiv.innerHTML = '<div style="text-align:center; color:#999; margin-top:20px;">ไม่พบผลลัพธ์</div>';
+            } else {
+                notFoundBox.classList.remove('hidden');
+                resultsDiv.innerHTML = '<div style="text-align:center; color:#999; margin-top:20px; font-size:14px;">ไม่พบผลลัพธ์</div>';
                 return;
             }
 
-            // Loop สร้างการ์ดผลลัพธ์
             filtered.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'result-item';
@@ -300,18 +342,15 @@
 
         function sendToLine(name) {
             if (!liff.isInClient()) {
+                // กรณี Test ใน Browser
                 alert("ส่งค่า: " + name);
                 return;
             }
-            liff.sendMessages([{
-                type: 'text',
-                text: name 
-            }]).then(() => {
-                liff.closeWindow(); 
-            }).catch((err) => {
-                console.error('Error:', err);
-            });
+            liff.sendMessages([{ type: 'text', text: name }])
+                .then(() => liff.closeWindow())
+                .catch((err) => console.error('Error:', err));
         }
     </script>
 </body>
 </html>
+
