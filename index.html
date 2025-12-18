@@ -5,285 +5,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ค้นหาสมุนไพร</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <style>
         /* Setup & Reset */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        /* 1. ใช้ Font Tahoma ตามที่ขอ */
         body {
-            font-family: 'Sarabun', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #eff5ef;
-            color: #333;
+            font-family: 'Tahoma', sans-serif;
+            margin: 0; padding: 0;
+            background-color: #eff5ef; color: #333;
             min-height: 100vh;
         }
 
-        .container {
-            padding: 20px;
-            max-width: 480px;
-            margin: 0 auto;
-        }
+        .container { padding: 20px; max-width: 480px; margin: 0 auto; }
 
         /* Search Card */
         .search-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            padding: 24px 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-            text-align: left;
+            background: #fff;
+            border-radius: 24px; padding: 24px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px; text-align: left;
         }
 
         h3 {
-            margin: 0 0 8px 0;
-            color: #2e4a33;
-            font-size: 18px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin: 0 0 8px 0; color: #2e4a33; font-size: 19px; /* ปรับขนาดให้เข้ากับ Tahoma */
+            font-weight: bold;
+            display: flex; align-items: center; gap: 8px;
         }
-        
         h3::before {
-            content: '';
-            display: block;
-            width: 10px;
-            height: 10px;
-            background-color: #66bb6a;
-            border-radius: 50%;
+            content: ''; display: block; width: 8px; height: 18px;
+            background-color: #06C755; border-radius: 4px;
         }
+        h3 span { font-weight: normal; font-size: 16px; color: #888; }
 
-        h3 span {
-            font-weight: 400;
-            font-size: 16px;
-            color: #555;
-        }
+        .subtitle { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.5; }
 
-        .subtitle {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-
-        /* Input Field - ปรับให้ดู Friendly ขึ้น */
-        .input-wrapper {
-            position: relative;
-            margin-bottom: 10px;
-        }
+        /* Input Field */
+        .input-wrapper { position: relative; margin-bottom: 10px; }
         input {
-            width: 100%;
-            padding: 16px 20px;
-            border-radius: 16px;
-            border: none;
-            background-color: #f0f2f0;
-            font-size: 16px;
-            font-family: 'Sarabun', sans-serif;
-            outline: none;
-            color: #333;
-            transition: all 0.3s;
+            width: 100%; padding: 16px 20px;
+            border-radius: 12px; border: 1px solid #ddd;
+            background-color: #fff; font-size: 16px;
+            font-family: 'Tahoma', sans-serif; outline: none; color: #333;
         }
-        input::placeholder { color: #aaa; }
-        /* ลบสไตล์ Disabled ออก เพราะเราจะให้พิมพ์ได้ตลอด */
-        input:focus { 
-            background-color: #fff; 
-            box-shadow: 0 0 0 2px #a5d6a7; 
-        }
-
-        .helper-text {
-            font-size: 12px;
-            color: #888;
-            margin-left: 5px;
-        }
-
-        /* Result Count */
-        .count-text {
-            font-size: 13px;
-            color: #777;
-            margin: 10px 0 10px 5px;
-        }
-
-        /* Loading Indicator */
-        #loading { 
-            text-align: center; color: #888; margin-top: 20px; font-size: 13px; 
-            display: flex; justify-content: center; gap: 5px;
-        }
-        .hidden { display: none !important; }
+        input:focus { border-color: #06C755; box-shadow: 0 0 0 2px rgba(6, 199, 85, 0.1); }
 
         /* Result Items */
+        .count-text { font-size: 13px; color: #777; margin: 10px 0 10px 5px; }
         .result-item {
-            background: white;
-            border-radius: 18px;
-            padding: 16px 20px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            background: white; border-radius: 16px; padding: 16px 20px;
+            margin-bottom: 12px; border: 1px solid #eee;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02); 
             cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.1s;
         }
-        .result-item:active { 
-            transform: scale(0.98); 
-            background-color: #f9f9f9;
-        }
+        .result-item:active { background-color: #e8f5e9; border-color: #06C755; }
 
-        .card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
+        .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .herb-name { font-size: 18px; font-weight: bold; color: #333; }
+        .id-badge { background-color: #f5f5f5; color: #999; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+        .card-detail { font-size: 14px; color: #555; }
 
-        .herb-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: #333;
-        }
+        /* Loading */
+        #loading { text-align: center; color: #888; margin-top: 20px; font-size: 13px; }
+        .hidden { display: none !important; }
 
-        .id-badge {
-            background-color: #f0f0f0;
-            color: #888;
-            font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .card-detail {
-            font-size: 14px;
-            color: #666;
-        }
-
-        /* Contact Box */
+        /* --- ส่วนที่แก้ให้เหมือนรูปเป๊ะๆ (Contact Box) --- */
         .contact-box {
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 20px;
-            padding: 15px;
-            margin-top: 25px;
-            border: 1px solid rgba(255,255,255,0.5);
+            background: #f8f9fa; /* สีพื้นเทาจางๆ */
+            border-radius: 16px; padding: 20px;
+            margin-top: 25px; text-align: center;
         }
-        .contact-title {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 12px;
-            text-align: left;
-            margin-left: 5px;
+        .contact-title { 
+            font-size: 14px; color: #6c757d; 
+            margin-bottom: 15px; font-weight: normal; 
         }
-        .btn-group {
-            display: flex;
-            gap: 12px;
+        .btn-group { display: flex; gap: 12px; justify-content: center; }
+        
+        .btn {
+            flex: 1; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: bold; cursor: pointer;
+            text-decoration: none; border: 1px solid #dee2e6; /* ขอบจางๆ */
+            
+            /* 2. สีปุ่มเป็นสีเทา ตามรูป */
+            background-color: #e9ecef; 
+            color: #495057; /* ตัวหนังสือสีเทาเข้ม */
+            box-shadow: none; /* เอาเงาออกให้ดูคลีน */
+            transition: background-color 0.2s;
         }
         
-        .demo-btn {
-            flex: 1;
-            padding: 10px 15px;
-            border-radius: 50px;
-            border: 1px solid #e0e0e0;
-            background-color: #f7f7f7;
-            color: #444;
-            font-family: 'Sarabun', sans-serif;
-            font-size: 15px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: all 0.2s;
+        .btn:active { background-color: #dbe0e6; transform: scale(0.98); }
+        
+        /* 3. ไอคอนสีเทาเข้ม */
+        .icon-svg { width: 22px; height: 22px; margin-right: 8px; fill: #343a40; }
+
+        /* Overlay Loading */
+        .overlay-loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.7); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
         }
-        .demo-btn:active {
-             background-color: #e8e8e8;
-             transform: translateY(1px);
-             box-shadow: none;
+        .spinner {
+            width: 30px; height: 30px; border: 3px solid #ccc;
+            border-top: 3px solid #06C755; border-radius: 50%;
+            animation: spin 0.6s linear infinite;
         }
-        .icon-svg { width: 18px; height: 18px; fill: currentColor; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     </style>
 </head>
 <body>
 
+    <div id="sendingOverlay" class="overlay-loading hidden">
+        <div class="spinner"></div>
+    </div>
+
     <div class="container">
         <div class="search-card">
             <h3>ค้นหาสมุนไพร <span>(ผลต่อ INR)</span></h3>
-            <div class="subtitle">พิมพ์อย่างน้อย 2 ตัวอักษร เพื่อค้นหา แล้วแตะรายการที่ต้องการ ระบบจะส่งชื่อสมุนไพรกลับไปในแชทอัตโนมัติ</div>
+            <div class="subtitle">พิมพ์ชื่อสมุนไพรเพื่อค้นหา (ขั้นต่ำ 2 ตัวอักษร)</div>
             
             <div class="input-wrapper">
-                <input type="text" id="searchInput" placeholder="เช่น มะ / กระ / ชา" oninput="searchData()">
+                <input type="text" id="searchInput" placeholder="พิมพ์ชื่อสมุนไพร..." oninput="searchData()">
             </div>
-            <div class="helper-text">เริ่มพิมพ์เพื่อค้นหา (อย่างน้อย 2 ตัวอักษร)</div>
             
             <div id="notFoundBox" class="contact-box hidden">
                 <div class="contact-title">หากไม่พบสมุนไพรที่ต้องการ กรุณาติดต่อได้ที่</div>
                 <div class="btn-group">
-                    <div class="demo-btn">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.49-5.15-3.8-6.62-6.63l1.97-1.57c.26-.29.35-.69.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3.28 3 3.92 3 4.78c0 9.77 8.23 18 18 18 .88 0 1.54-.67 1.54-1.21v-3.72c0-.54-.45-.99-.99-.99z"/></svg>
+                    <a href="tel:077123456" class="btn">
+                        <svg class="icon-svg" viewBox="0 0 512 512"><path d="M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z"/>
+                        </svg>
                         โทร
-                    </div>
-                    <div class="demo-btn">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 5.57 2 10c0 2.45 1.38 4.62 3.59 6.08-.2.72-.73 2.58-.84 3.03-.09.4.17.61.42.44 2.22-1.47 3.86-2.52 4.18-2.73.53.08 1.08.13 1.65.13 5.52 0 10-3.57 10-8s-4.48-8-10-8z"/></svg>
+                    </a>
+                    <a href="https://line.me/ti/p/@yourid" target="_blank" class="btn">
+                        <svg class="icon-svg" viewBox="0 0 512 512"><path d="M256 32C114.6 32 0 125.1 0 240c0 49.6 21.4 95 57 130.7C44.5 421.1 2.7 466 2.2 466.5c-2.2 2.3-2.8 5.7-1.5 8.7S4.8 480 8 480c66.3 0 116-31.8 140.6-51.4 32.7 12.3 69 19.4 107.4 19.4 141.4 0 256-93.1 256-208S397.4 32 256 32z"/>
+                        </svg>
                         แอดไลน์
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
 
         <div id="loading" class="hidden">🔄 กำลังโหลดข้อมูล...</div>
-
         <div id="resultCount" class="count-text hidden"></div>
         <div id="results"></div>
     </div>
 
     <script>
-        // ----------------------------------------------------
-        // ใส่ Web App URL เดิมของคุณ (ถ้ายังไม่ได้เปลี่ยน Key ก็ใช้อันเดิม)
-        // ----------------------------------------------------
+        // URL Web App เดิมของคุณ
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwS1fCVXO2I9zmH-tAnqPdhxSYGmPGIIQ0FMfNjR6kb6Ft2hdHL7msTVBK_dkl52OGK/exec"; 
 
         let allHerbs = [];
         let isDataLoaded = false;
 
         async function main() {
-            // 1. โหลด Cache (ถ้ามี)
             const cachedData = localStorage.getItem('herbData_v1');
             if (cachedData) {
-                try {
-                    allHerbs = JSON.parse(cachedData);
-                    isDataLoaded = true;
-                } catch (e) { console.error("Cache Error", e); }
+                try { allHerbs = JSON.parse(cachedData); isDataLoaded = true; } catch(e){}
             }
 
-            // เริ่ม LIFF
             await liff.init({ liffId: "2008726880-JRgSRcyj" });
-            
-            // 2. ดึงข้อมูลจริง (เบื้องหลัง)
+
             fetchData();
         }
 
         async function fetchData() {
             const loading = document.getElementById('loading');
-            
-            // ถ้ายังไม่มีข้อมูลใน Cache ให้โชว์ Loading รอไว้ด้านล่าง
             if (!isDataLoaded) loading.classList.remove('hidden');
 
             try {
                 const response = await fetch(GAS_API_URL);
                 const newData = await response.json();
-                
                 allHerbs = newData;
                 isDataLoaded = true;
                 localStorage.setItem('herbData_v1', JSON.stringify(newData));
-                
                 loading.classList.add('hidden');
                 
-                // ถ้าลูกค้าพิมพ์รอไว้แล้ว ให้สั่งค้นหาทันทีที่ข้อมูลมาถึง
                 const input = document.getElementById('searchInput');
-                if(input.value.length >= 2) {
-                    searchData();
-                }
-
+                if(input.value.length >= 2) searchData();
             } catch (error) {
-                console.error("Fetch Error:", error);
-                loading.innerText = "เชื่อมต่อฐานข้อมูลไม่ได้";
+                console.error("Error", error);
+                loading.innerText = "";
             }
         }
 
@@ -300,14 +203,10 @@
             countDiv.classList.add('hidden');
             notFoundBox.classList.add('hidden');
 
-            // ถ้าพิมพ์ไม่ถึง 2 ตัวอักษร ไม่ทำอะไร
             if (query.length < 2) return;
 
-            // *** สำคัญ: ถ้าข้อมูลยังโหลดไม่เสร็จ ให้ขึ้น Loading แทน Not Found ***
             if (!isDataLoaded || allHerbs.length === 0) {
-                loading.classList.remove('hidden');
-                loading.innerText = "กำลังค้นหาข้อมูล...";
-                return; 
+                loading.classList.remove('hidden'); return; 
             } else {
                 loading.classList.add('hidden');
             }
@@ -318,8 +217,9 @@
                 countDiv.innerText = `พบ ${filtered.length} รายการ`;
                 countDiv.classList.remove('hidden');
             } else {
+                // ถ้าไม่เจอ ให้โชว์กล่องปุ่มสีเทาที่เราแก้แล้ว
                 notFoundBox.classList.remove('hidden');
-                resultsDiv.innerHTML = '<div style="text-align:center; color:#999; margin-top:20px; font-size:14px;">ไม่พบผลลัพธ์</div>';
+                resultsDiv.innerHTML = '<div style="text-align:center; color:#ccc; margin-top:20px; font-size:14px;">- ไม่พบข้อมูล -</div>';
                 return;
             }
 
@@ -335,22 +235,33 @@
                         ${item.inr || '-'} • LOE: ${item.loe || '-'}
                     </div>
                 `;
-                div.onclick = () => sendToLine(item.name);
+                div.addEventListener('click', function() {
+                    sendToLine(item.name);
+                });
                 resultsDiv.appendChild(div);
             });
         }
 
         function sendToLine(name) {
+            document.getElementById('sendingOverlay').classList.remove('hidden');
+
             if (!liff.isInClient()) {
-                // กรณี Test ใน Browser
-                alert("ส่งค่า: " + name);
+                setTimeout(() => {
+                    alert("ส่งค่า: " + name);
+                    document.getElementById('sendingOverlay').classList.add('hidden');
+                }, 300);
                 return;
             }
+
             liff.sendMessages([{ type: 'text', text: name }])
-                .then(() => liff.closeWindow())
-                .catch((err) => console.error('Error:', err));
+                .then(() => {
+                    liff.closeWindow();
+                })
+                .catch((err) => {
+                    console.error('Error:', err);
+                    document.getElementById('sendingOverlay').classList.add('hidden');
+                });
         }
     </script>
 </body>
 </html>
-
