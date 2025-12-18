@@ -10,7 +10,6 @@
         /* Setup & Reset */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        /* 1. ใช้ Font Tahoma ตามที่ขอ */
         body {
             font-family: 'Tahoma', sans-serif;
             margin: 0; padding: 0;
@@ -29,7 +28,7 @@
         }
 
         h3 {
-            margin: 0 0 8px 0; color: #2e4a33; font-size: 19px; /* ปรับขนาดให้เข้ากับ Tahoma */
+            margin: 0 0 8px 0; color: #2e4a33; font-size: 19px; 
             font-weight: bold;
             display: flex; align-items: center; gap: 8px;
         }
@@ -37,12 +36,17 @@
             content: ''; display: block; width: 8px; height: 18px;
             background-color: #06C755; border-radius: 4px;
         }
+        /* ข้อความวงเล็บเดิม */
         h3 span { font-weight: normal; font-size: 16px; color: #888; }
 
-        .subtitle { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.5; }
+        /* คำอธิบายด้านบน (แก้ตามคำสั่ง) */
+        .subtitle { 
+            font-size: 14px; color: #666; 
+            margin-bottom: 20px; line-height: 1.5; 
+        }
 
         /* Input Field */
-        .input-wrapper { position: relative; margin-bottom: 10px; }
+        .input-wrapper { position: relative; margin-bottom: 5px; }
         input {
             width: 100%; padding: 16px 20px;
             border-radius: 12px; border: 1px solid #ddd;
@@ -51,14 +55,20 @@
         }
         input:focus { border-color: #06C755; box-shadow: 0 0 0 2px rgba(6, 199, 85, 0.1); }
 
+        /* ข้อความสถานะด้านล่าง Input (แก้ตามคำสั่ง) */
+        .status-text {
+            font-size: 13px; color: #888; 
+            margin-left: 5px; margin-top: 8px; min-height: 20px;
+        }
+
         /* Result Items */
-        .count-text { font-size: 13px; color: #777; margin: 10px 0 10px 5px; }
         .result-item {
             background: white; border-radius: 16px; padding: 16px 20px;
             margin-bottom: 12px; border: 1px solid #eee;
             box-shadow: 0 2px 5px rgba(0,0,0,0.02); 
             cursor: pointer;
         }
+        /* Active State */
         .result-item:active { background-color: #e8f5e9; border-color: #06C755; }
 
         .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
@@ -70,10 +80,9 @@
         #loading { text-align: center; color: #888; margin-top: 20px; font-size: 13px; }
         .hidden { display: none !important; }
 
-        /* --- ส่วนที่แก้ให้เหมือนรูปเป๊ะๆ (Contact Box) --- */
+        /* Contact Box */
         .contact-box {
-            background: #f8f9fa; /* สีพื้นเทาจางๆ */
-            border-radius: 16px; padding: 20px;
+            background: #f8f9fa; border-radius: 16px; padding: 20px;
             margin-top: 25px; text-align: center;
         }
         .contact-title { 
@@ -86,18 +95,11 @@
             flex: 1; height: 48px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             font-size: 16px; font-weight: bold; cursor: pointer;
-            text-decoration: none; border: 1px solid #dee2e6; /* ขอบจางๆ */
-            
-            /* 2. สีปุ่มเป็นสีเทา ตามรูป */
-            background-color: #e9ecef; 
-            color: #495057; /* ตัวหนังสือสีเทาเข้ม */
-            box-shadow: none; /* เอาเงาออกให้ดูคลีน */
+            text-decoration: none; border: 1px solid #dee2e6;
+            background-color: #e9ecef; color: #495057; 
             transition: background-color 0.2s;
         }
-        
         .btn:active { background-color: #dbe0e6; transform: scale(0.98); }
-        
-        /* 3. ไอคอนสีเทาเข้ม */
         .icon-svg { width: 22px; height: 22px; margin-right: 8px; fill: #343a40; }
 
         /* Overlay Loading */
@@ -124,23 +126,28 @@
     <div class="container">
         <div class="search-card">
             <h3>ค้นหาสมุนไพร <span>(ผลต่อ INR)</span></h3>
-            <div class="subtitle">พิมพ์ชื่อสมุนไพรเพื่อค้นหา (ขั้นต่ำ 2 ตัวอักษร)</div>
+            
+            <div class="subtitle">
+                พิมพ์อย่างน้อย 2 ตัวอักษร เพื่อค้นหา แล้วแตะรายการที่ต้องการ ระบบจะส่งชื่อสมุนไพรกลับไปในแชทอัตโนมัติ
+            </div>
             
             <div class="input-wrapper">
-                <input type="text" id="searchInput" placeholder="พิมพ์ชื่อสมุนไพร..." oninput="searchData()">
+                <input type="text" id="searchInput" placeholder="พิมพ์ชื่อสมุนไพร..." oninput="handleInput()">
+            </div>
+            
+            <div id="statusText" class="status-text">
+                เริ่มพิมพ์เพื่อค้นหา (อย่างน้อย 2 ตัวอักษร)
             </div>
             
             <div id="notFoundBox" class="contact-box hidden">
                 <div class="contact-title">หากไม่พบสมุนไพรที่ต้องการ กรุณาติดต่อได้ที่</div>
                 <div class="btn-group">
                     <a href="tel:077123456" class="btn">
-                        <svg class="icon-svg" viewBox="0 0 512 512"><path d="M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z"/>
-                        </svg>
+                        <svg class="icon-svg" viewBox="0 0 512 512"><path d="M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z"/></svg>
                         โทร
                     </a>
                     <a href="https://line.me/ti/p/@yourid" target="_blank" class="btn">
-                        <svg class="icon-svg" viewBox="0 0 512 512"><path d="M256 32C114.6 32 0 125.1 0 240c0 49.6 21.4 95 57 130.7C44.5 421.1 2.7 466 2.2 466.5c-2.2 2.3-2.8 5.7-1.5 8.7S4.8 480 8 480c66.3 0 116-31.8 140.6-51.4 32.7 12.3 69 19.4 107.4 19.4 141.4 0 256-93.1 256-208S397.4 32 256 32z"/>
-                        </svg>
+                        <svg class="icon-svg" viewBox="0 0 512 512"><path d="M256 32C114.6 32 0 125.1 0 240c0 49.6 21.4 95 57 130.7C44.5 421.1 2.7 466 2.2 466.5c-2.2 2.3-2.8 5.7-1.5 8.7S4.8 480 8 480c66.3 0 116-31.8 140.6-51.4 32.7 12.3 69 19.4 107.4 19.4 141.4 0 256-93.1 256-208S397.4 32 256 32z"/></svg>
                         แอดไลน์
                     </a>
                 </div>
@@ -148,12 +155,10 @@
         </div>
 
         <div id="loading" class="hidden">🔄 กำลังโหลดข้อมูล...</div>
-        <div id="resultCount" class="count-text hidden"></div>
         <div id="results"></div>
     </div>
 
     <script>
-        // URL Web App เดิมของคุณ
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwS1fCVXO2I9zmH-tAnqPdhxSYGmPGIIQ0FMfNjR6kb6Ft2hdHL7msTVBK_dkl52OGK/exec"; 
 
         let allHerbs = [];
@@ -166,7 +171,6 @@
             }
 
             await liff.init({ liffId: "2008726880-JRgSRcyj" });
-
             fetchData();
         }
 
@@ -182,8 +186,9 @@
                 localStorage.setItem('herbData_v1', JSON.stringify(newData));
                 loading.classList.add('hidden');
                 
+                // ถ้ามีข้อความค้างอยู่ ให้ค้นหาใหม่ทันที
                 const input = document.getElementById('searchInput');
-                if(input.value.length >= 2) searchData();
+                if(input.value.length >= 2) handleInput();
             } catch (error) {
                 console.error("Error", error);
                 loading.innerText = "";
@@ -192,34 +197,46 @@
 
         main();
 
-        function searchData() {
+        function handleInput() {
             const query = document.getElementById('searchInput').value.trim();
             const resultsDiv = document.getElementById('results');
-            const countDiv = document.getElementById('resultCount');
+            const statusText = document.getElementById('statusText');
             const notFoundBox = document.getElementById('notFoundBox');
             const loading = document.getElementById('loading');
             
             resultsDiv.innerHTML = '';
-            countDiv.classList.add('hidden');
             notFoundBox.classList.add('hidden');
 
-            if (query.length < 2) return;
+            // 1. กรณีพิมพ์ยังไม่ถึง 2 ตัวอักษร
+            if (query.length < 2) {
+                statusText.innerText = "เริ่มพิมพ์เพื่อค้นหา (อย่างน้อย 2 ตัวอักษร)";
+                statusText.style.color = "#888";
+                return;
+            }
 
+            // 2. กรณียังโหลดข้อมูลไม่เสร็จ
             if (!isDataLoaded || allHerbs.length === 0) {
-                loading.classList.remove('hidden'); return; 
+                statusText.innerText = "กำลังค้นหา...";
+                loading.classList.remove('hidden'); 
+                return; 
             } else {
                 loading.classList.add('hidden');
             }
 
+            // แสดงสถานะ "กำลังค้นหา..." ระหว่างกรองข้อมูล (แป๊บเดียว)
+            statusText.innerText = "กำลังค้นหา...";
+
             const filtered = allHerbs.filter(item => item.name.includes(query));
 
             if (filtered.length > 0) {
-                countDiv.innerText = `พบ ${filtered.length} รายการ`;
-                countDiv.classList.remove('hidden');
+                // 3. เจอผลลัพธ์
+                statusText.innerText = `พบ ${filtered.length} ผลลัพธ์`;
+                statusText.style.color = "#06C755"; // ให้ตัวเลขเป็นสีเขียวเพื่อให้สังเกตง่าย
             } else {
-                // ถ้าไม่เจอ ให้โชว์กล่องปุ่มสีเทาที่เราแก้แล้ว
+                // 4. ไม่เจอผลลัพธ์
+                statusText.innerText = "ไม่พบผลลัพธ์";
+                statusText.style.color = "#d9534f"; // สีแดงอ่อนๆ
                 notFoundBox.classList.remove('hidden');
-                resultsDiv.innerHTML = '<div style="text-align:center; color:#ccc; margin-top:20px; font-size:14px;">- ไม่พบข้อมูล -</div>';
                 return;
             }
 
@@ -235,9 +252,17 @@
                         ${item.inr || '-'} • LOE: ${item.loe || '-'}
                     </div>
                 `;
-                div.addEventListener('click', function() {
+                
+                // *** แก้ปัญหาคลิกไม่ติดในครั้งแรก ***
+                // ใช้ onmousedown preventDefault เพื่อไม่ให้ Input เสีย Focus แล้วปิดคีย์บอร์ดทับ Event Click
+                div.onmousedown = function(event) {
+                    event.preventDefault(); 
+                };
+                
+                div.onclick = function() {
                     sendToLine(item.name);
-                });
+                };
+
                 resultsDiv.appendChild(div);
             });
         }
