@@ -3,50 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ค้นหาสมุนไพร</title>
+    <title>ค้นหายา</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     
     <style>
-        /* Reset & Setup */
+        /* UI เดิมทุกประการ (Green Theme) */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
-            /* ใช้ Tahoma ตามที่เคยระบุ แต่ปรับ spacing ให้อ่านง่าย */
             font-family: 'Tahoma', sans-serif;
             margin: 0; 
             padding: 20px;
-            background-color: #ccdvc1; /* สีพื้นหลังโทนเขียวจางๆ คล้ายในรูป */
+            background-color: #ccdvc1; 
             background: linear-gradient(180deg, #dcebe0 0%, #eff5ef 100%);
             min-height: 100vh;
             color: #333;
         }
 
-        /* Main Card Container */
-        .container { 
-            max-width: 450px; 
-            margin: 0 auto; 
-        }
+        .container { max-width: 450px; margin: 0 auto; }
 
         .search-card {
             background: #ffffff;
             border-radius: 20px; 
             padding: 25px 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-            /* ให้การ์ดดูมีมิติเหมือนลอยอยู่บนพื้นหลัง */
         }
 
-        /* Header Section */
         h3 {
             margin: 0 0 5px 0; 
-            color: #2F3E33; /* สีเขียวเข้มเกือบดำ */
+            color: #2F3E33; 
             font-size: 20px; 
             font-weight: bold;
             display: flex; align-items: center; gap: 10px;
         }
-        /* จุดสีเขียวหน้าหัวข้อ */
         h3::before {
             content: ''; display: block; width: 10px; height: 10px;
-            background-color: #8EB996; /* สีเขียวละมุนตามรูป */
+            background-color: #8EB996; 
             border-radius: 50%;
         }
         h3 span { font-weight: normal; font-size: 16px; color: #666; }
@@ -54,58 +46,40 @@
         .subtitle { 
             font-size: 14px; color: #888; 
             margin-bottom: 20px; line-height: 1.4; 
-            margin-left: 20px; /* ย่อหน้าให้ตรงกับ text */
+            margin-left: 20px; 
         }
 
-        /* Input Field styling - เป๊ะตามรูป */
         .input-wrapper { position: relative; margin-bottom: 5px; }
         input {
             width: 100%; 
             padding: 16px 20px;
-            border-radius: 15px; /* ความมนตามรูป */
-            border: none; /* ไม่มีขอบ */
-            background-color: #f1f3f5; /* สีเทาอ่อน */
+            border-radius: 15px; 
+            border: none; 
+            background-color: #f1f3f5; 
             font-size: 16px;
             font-family: 'Tahoma', sans-serif; 
             outline: none; 
             color: #333;
         }
-        /* เวลาแตะไม่ต้องมีเส้นขอบสีแปลกๆ */
-        input:focus { 
-            background-color: #e9ecef;
-        }
-        input::placeholder {
-            color: #adb5bd;
-        }
+        input:focus { background-color: #e9ecef; }
+        input::placeholder { color: #adb5bd; }
 
-        /* Status Text Area */
         .status-area {
             min-height: 30px;
             margin-top: 10px;
             margin-bottom: 15px;
             margin-left: 5px;
         }
-        .status-text {
-            font-size: 14px; 
-            color: #adb5bd; /* สีเทาจางๆ สำหรับข้อความ default */
-        }
-        .status-highlight {
-            color: #666; /* สีเข้มขึ้นเมื่อเจอ */
-        }
-        .status-sub {
-            display: block;
-            font-size: 12px;
-            color: #999;
-            margin-top: 4px;
-        }
+        .status-text { font-size: 14px; color: #adb5bd; }
+        .status-highlight { color: #666; }
+        .status-sub { display: block; font-size: 12px; color: #999; margin-top: 4px; }
 
-        /* Result Items */
         .result-item {
             background: white; 
             border-radius: 16px; 
             padding: 15px 20px;
             margin-bottom: 12px; 
-            border: 1px solid #f0f0f0; /* ขอบจางๆ */
+            border: 1px solid #f0f0f0; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
             cursor: pointer;
             position: relative;
@@ -113,9 +87,8 @@
         .result-item:active { background-color: #f8f9fa; }
 
         .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .herb-name { font-size: 18px; font-weight: bold; color: #333; }
+        .drug-name { font-size: 18px; font-weight: bold; color: #333; }
         
-        /* Badge มุมขวาบน (h15, h18) */
         .id-badge { 
             background-color: #f1f3f5; 
             color: #888; 
@@ -127,39 +100,22 @@
         
         .card-detail { font-size: 14px; color: #666; }
 
-        /* Contact Section (Footer) - วางไว้ด้านล่างเสมอ */
-        .contact-section {
-            margin-top: 30px;
-            border-top: 1px solid transparent;
-        }
-        .contact-label {
-            font-size: 14px; color: #888;
-            margin-bottom: 15px;
-        }
+        .contact-section { margin-top: 30px; border-top: 1px solid transparent; }
+        .contact-label { font-size: 14px; color: #888; margin-bottom: 15px; }
         
         .btn-group { display: flex; gap: 12px; }
         
-        /* ปุ่มกด - ดีไซน์เดียวกับ Input (สีเทา) */
         .btn {
-            flex: 1; 
-            height: 50px; 
-            border-radius: 15px;
+            flex: 1; height: 50px; border-radius: 15px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 16px; 
-            font-weight: normal; 
-            cursor: pointer;
-            text-decoration: none; 
-            border: none;
-            background-color: #f1f3f5; /* สีพื้นหลังเดียวกับ Input */
-            color: #495057; 
+            font-size: 16px; font-weight: normal; cursor: pointer;
+            text-decoration: none; border: none;
+            background-color: #f1f3f5; color: #495057; 
             transition: background-color 0.2s;
         }
         .btn:active { background-color: #e2e6ea; transform: scale(0.98); }
-        
-        /* ไอคอน */
         .icon-svg { width: 20px; height: 20px; margin-right: 10px; fill: #495057; }
 
-        /* Loading & Overlay */
         #loading { text-align: center; color: #888; margin-top: 20px; font-size: 13px; }
         .hidden { display: none !important; }
 
@@ -174,7 +130,6 @@
             animation: spin 0.6s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
     </style>
 </head>
 <body>
@@ -185,13 +140,14 @@
 
     <div class="container">
         <div class="search-card">
-            <h3>ค้นหาสมุนไพร <span>(ผลต่อ INR)</span></h3>
+            <!-- ปรับ Text Header เล็กน้อยให้เข้ากับบริบท -->
+            <h3>ค้นหายา <span>(Safety Data)</span></h3>
             <div class="subtitle">
-                พิมพ์อย่างน้อย 2 ตัวอักษร เพื่อค้นหา แล้วแตะรายการที่ต้องการ ระบบจะส่งชื่อสมุนไพรกลับไปในแชทอัตโนมัติ
+                พิมพ์อย่างน้อย 2 ตัวอักษร เพื่อค้นหา แล้วแตะรายการที่ต้องการ ระบบจะส่งข้อมูลยากลับไปในแชทอัตโนมัติ
             </div>
             
             <div class="input-wrapper">
-                <input type="text" id="searchInput" placeholder="เช่น มะ / กระ / ชา" oninput="handleInput()">
+                <input type="text" id="searchInput" placeholder="พิมพ์ชื่อยา (Eng)" oninput="handleInput()">
             </div>
             
             <div id="statusArea" class="status-area">
@@ -201,7 +157,7 @@
             <div id="results"></div>
 
             <div class="contact-section">
-                <div class="contact-label">หากไม่พบสมุนไพรที่ต้องการ กรุณาติดต่อได้ที่</div>
+                <div class="contact-label">หากไม่พบยาที่ต้องการ กรุณาติดต่อได้ที่</div>
                 <div class="btn-group">
                     <a href="tel:077123456" class="btn">
                         <svg class="icon-svg" viewBox="0 0 512 512">
@@ -223,19 +179,22 @@
     </div>
 
     <script>
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwS1fCVXO2I9zmH-tAnqPdhxSYGmPGIIQ0FMfNjR6kb6Ft2hdHL7msTVBK_dkl52OGK/exec"; 
+        // ** กรุณาระบุ GAS Web App URL และ LIFF ID ที่นี่ **
+        const GAS_API_URL = "YOUR_GAS_WEB_APP_URL"; 
+        const MY_LIFF_ID = "YOUR_LIFF_ID";
 
-        let allHerbs = [];
+        let allDrugs = [];
         let isDataLoaded = false;
 
         async function main() {
-            // ใช้ Cache เพื่อความเร็ว
-            const cachedData = localStorage.getItem('herbData_v1');
+            // Clear cache เก่าถ้ามี (เพราะเปลี่ยนจากสมุนไพรเป็นยา)
+            // หรือเปลี่ยนชื่อ key เป็น drugData_v1
+            const cachedData = localStorage.getItem('drugData_v1');
             if (cachedData) {
-                try { allHerbs = JSON.parse(cachedData); isDataLoaded = true; } catch(e){}
+                try { allDrugs = JSON.parse(cachedData); isDataLoaded = true; } catch(e){}
             }
 
-            await liff.init({ liffId: "2008726880-JRgSRcyj" });
+            await liff.init({ liffId: MY_LIFF_ID });
             fetchData();
         }
 
@@ -246,17 +205,16 @@
             try {
                 const response = await fetch(GAS_API_URL);
                 const newData = await response.json();
-                allHerbs = newData;
+                allDrugs = newData;
                 isDataLoaded = true;
-                localStorage.setItem('herbData_v1', JSON.stringify(newData));
+                localStorage.setItem('drugData_v1', JSON.stringify(newData));
                 loading.classList.add('hidden');
                 
-                // เช็คค่าค้างใน input
                 const input = document.getElementById('searchInput');
                 if(input.value.length > 0) handleInput();
             } catch (error) {
                 console.error("Error", error);
-                loading.innerText = "";
+                loading.innerText = "โหลดข้อมูลไม่สำเร็จ";
             }
         }
 
@@ -270,15 +228,15 @@
             
             resultsDiv.innerHTML = '';
 
-            // --- State 1: ยังไม่พิมพ์ หรือพิมพ์ไม่ครบ 2 ตัว ---
+            // State 1: พิมพ์ไม่ครบ
             if (query.length < 2) {
                 statusMain.innerHTML = "เริ่มพิมพ์เพื่อค้นหา (อย่างน้อย 2 ตัวอักษร)";
-                statusMain.className = "status-text"; // สีเทาจาง
+                statusMain.className = "status-text"; 
                 return;
             }
 
-            // --- State 2: กำลังโหลดข้อมูล (ถ้ายังไม่มา) ---
-            if (!isDataLoaded || allHerbs.length === 0) {
+            // State 2: กำลังโหลด
+            if (!isDataLoaded || allDrugs.length === 0) {
                 statusMain.innerHTML = "กำลังค้นหา...";
                 statusMain.className = "status-highlight";
                 loading.classList.remove('hidden'); 
@@ -287,20 +245,18 @@
                 loading.classList.add('hidden');
             }
 
-            // แสดงคำว่า "กำลังค้นหา..." ชั่วขณะ (Optional)
-            // statusMain.innerHTML = "กำลังค้นหา...";
-
-            const filtered = allHerbs.filter(item => item.name.includes(query));
+            // กรองข้อมูล: ค้นหาจาก drug name
+            const filtered = allDrugs.filter(item => 
+                item.drug.toLowerCase().includes(query.toLowerCase())
+            );
 
             if (filtered.length > 0) {
-                // --- State 3: พบข้อมูล ---
                 statusMain.className = "status-highlight";
                 statusMain.innerHTML = `
                     พบ ${filtered.length} รายการ
-                    <span class="status-sub">นี่คือคำตอบ หากท่านอยากเห็นคำตอบอีกครั้งในแชท ก็คลิกที่สมุนไพรที่ต้องการ</span>
+                    <span class="status-sub">คลิกที่รายชื่อยาเพื่อส่งผลเข้าแชท</span>
                 `;
             } else {
-                // --- State 4: ไม่พบข้อมูล ---
                 statusMain.className = "status-text";
                 statusMain.innerHTML = "ไม่พบผลลัพธ์";
                 return;
@@ -310,19 +266,20 @@
             filtered.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'result-item';
+                // ปรับการแสดงผล: ชื่อยา + FDA Category
                 div.innerHTML = `
                     <div class="card-top">
-                        <div class="herb-name">${item.name}</div>
-                        <div class="id-badge">${item.id || ''}</div>
+                        <div class="drug-name">${item.drug}</div>
+                        <div class="id-badge">${item.fda ? 'FDA: ' + item.fda : '-'}</div>
                     </div>
                     <div class="card-detail">
-                        ${item.inr || '-'} • LOE: ${item.loe || '-'}
+                        ${item.category || 'General'}
                     </div>
                 `;
                 
-                // แก้ปัญหาคลิกครั้งแรกไม่ติด (เหมือนเดิม)
                 div.onmousedown = function(event) { event.preventDefault(); };
-                div.onclick = function() { sendToLine(item.name); };
+                // ส่งชื่อยากลับไปที่ Line เพื่อให้ Bot ค้นหาและตอบกลับด้วย Flex Message
+                div.onclick = function() { sendToLine(item.drug); };
 
                 resultsDiv.appendChild(div);
             });
@@ -339,6 +296,7 @@
                 return;
             }
 
+            // ส่งชื่อยากลับไปเป็น Text ธรรมดา แล้วให้ Bot (doPost) ตอบกลับเป็น Flex Message
             liff.sendMessages([{ type: 'text', text: name }])
                 .then(() => {
                     liff.closeWindow();
